@@ -4,16 +4,24 @@ import ProductCard from "./components/ProductCard";
 const App = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setLoading] = useState(false);
+  const [isError, setError] = useState(false);
 
   useEffect(() => {
     getProducts();
   }, []);
 
   const getProducts = async () => {
-    setLoading(true);
-    const response = await fetch("https://fakestoreapi.com/products");
-    const products = await response.json();
-    setProducts(products);
+    try {
+      setLoading(true);
+      const response = await fetch("https://fakestoreapi.com/products");
+      if (!response.ok) {
+        throw new Error("No products found");
+      }
+      const products = await response.json();
+      setProducts(products);
+    } catch (error) {
+      setError(true);
+    }
     setLoading(false);
   };
 
@@ -26,6 +34,7 @@ const App = () => {
         ))}
       </section>
       {isLoading && <h1>Loading Products...</h1>}
+      {isError && <h1>{isError}</h1>}
     </>
   );
 };
